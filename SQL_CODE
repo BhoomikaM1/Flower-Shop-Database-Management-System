@@ -1,0 +1,90 @@
+# Physical Model :
+
+create table franchise 
+(F_ID number(4) 
+constraint franchise_id_pk primary key, 
+country varchar2(15), 
+city varchar2(15), 
+mgr_ssn number(4) 
+constraint mgr_nn not null); 
+
+create table florist 
+(ssn number(4) 
+constraint fl_ssn_pk primary key, 
+Fname varchar2(10) 
+constraint fn_nn not null, 
+Lname varchar2(10), 
+Age number(3) check (Age>17), 
+Sex varchar2(1), 
+Salary number(6) default 0 check (Salary >0 ), 
+Address varchar2(50), 
+Phone_# number(20), 
+Frunchise_ID number(4), 
+constraint franchise_id_fk foreign key (Frunchise_ID) 
+references franchise (F_ID)); 
+
+create table supplier 
+(supplier_ssn number(4) 
+constraint sup_ssn_pk primary key, 
+name varchar2(10) 
+constraint name_sup_nn not null);
+
+create table orders_from 
+(order_# number(4) constraint order_#_pk primary key , 
+order_date date default sysdate, 
+fr_id number(4) , 
+sup_ssn number(4) , 
+constraint franchise_order_fk foreign key (fr_id) references franchise (f_id), 
+constraint supplier_order_fk foreign key (sup_ssn) references supplier (supplier_ssn)); 
+
+create table flower 
+(id number(4) constraint flower_id_pk primary key , 
+Genus varchar2(20) , 
+species varchar2(20) , 
+variety varchar2(20) , 
+price number(3) , 
+quantity number(4), 
+description varchar2(200) ); 
+
+create table color 
+(flower_id number(4) , 
+color varchar2(10) , 
+constraint flower_id_color_fk foreign key (flower_id) references flower (id)); 
+
+create table has_stock 
+(franchise_id number(4) , 
+flower_id number(4) , 
+restock_date date , 
+stock_amount number(4) , 
+constraint franchise_flower_pk primary key (franchise_id,flower_id) , 
+constraint franchise_stock_fk foreign key (franchise_id) references franchise (f_id), 
+constraint flower_stock_fk foreign key (flower_id) references flower (id)); 
+
+create table order_details 
+(flower_id number(4) ,
+order_number number(4) , 
+amount number(4) default 0 check ( amount >=0 ), 
+constraint order_details_flowers_pk primary key (flower_id, order_number), 
+constraint flower_order_details_fk foreign key (flower_id) references flower (id), 
+constraint order_num_fk foreign key (order_number) references orders_from (order_#)); 
+
+create table rare_flowers 
+(flower_id number(4) , 
+country_of_orgin varchar2(20) , 
+constraint flower_id_rare_pk primary key (flower_id), 
+constraint flower_id_rare_fk foreign key (flower_id) references flower (id)); 
+
+create table all_year_flowers 
+(flower_id number(4) , 
+is_perfect number(1) , 
+constraint flower_id_allyear_pk primary key (flower_id), 
+constraint flower_id_allyear_fk foreign key (flower_id) references flower (id)); 
+
+create table seasonal_flowers 
+(flower_id number(4) , 
+season varchar2(10) , 
+constraint flower_id_seasonal_pk primary key (flower_id), 
+constraint flower_id_seasonal_fk foreign key (flower_id) references flower (id));
+
+ALTER table franchise 
+add constraint franchise_manager_fk foreign key (mgr_ssn) references florist (ssn);
